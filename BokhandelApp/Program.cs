@@ -21,7 +21,7 @@ void ValjButik()
     {
         Console.Clear();
         Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine("                                        --- BOKHANDEL ADMIN ---");
+        Console.WriteLine("                                        --- HUVUDMENYN (BOKHANDEL ADMIN) ---");
         Console.ResetColor();
         Console.WriteLine();
         Console.WriteLine("Välj butik:");
@@ -64,6 +64,24 @@ void ValjButik()
 
 void ButiksMeny(Butiker butik)
 {
-    Console.WriteLine("test");
+    while (true)
+    {
+        Console.Clear();
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine($"                                        --- {butik.Butiksnamn} (ADMIN) ---");
+        Console.ResetColor();
+
+        Console.WriteLine("\n Välj åtgärd:");
+        Console.WriteLine("[1] Visa lagersaldo");
+        Console.WriteLine("[2] Ändra lagersaldo");
+        Console.WriteLine("[3] Lägg till ny bok i sortimentet");
+        Console.WriteLine("[4] Ta bort bok ur sortimentet");
+        Console.WriteLine("[0] Gå tillbaka till huvudmenyn");
+
+        Console.WriteLine("\nDitt val: ");
+        string input = Console.ReadLine();
+
+        if (input == "0") return;
+    }
 }
 
