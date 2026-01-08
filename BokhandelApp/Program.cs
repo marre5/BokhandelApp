@@ -35,7 +35,7 @@ void ValjButik()
         }
         Console.WriteLine("[0] Avsluta");
 
-        Console.WriteLine("\nDitt val (ange ID): ");
+        Console.WriteLine("\nDitt val (ange siffra): ");
         string input = Console.ReadLine();
 
         if (input == "0") return;
@@ -78,10 +78,55 @@ void ButiksMeny(Butiker butik)
         Console.WriteLine("[4] Ta bort bok ur sortimentet");
         Console.WriteLine("[0] Gå tillbaka till huvudmenyn");
 
-        Console.WriteLine("\nDitt val: ");
+        Console.WriteLine("\nDitt val: (ange siffra) ");
         string input = Console.ReadLine();
 
-        if (input == "0") return;
+        switch (input)
+        {
+            case "1":
+                VisaLagersaldo(butik);
+                break;
+            case "0":
+                return;
+            default:
+                break;
+        }
     }
+}
+
+void VisaLagersaldo(Butiker butik)
+{
+    Console.Clear();
+    Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine($"                                        --- LAGERSALDO: {butik.Butiksnamn} ---");
+    Console.ResetColor();
+    Console.WriteLine();
+
+    var lagerLista = db.LagerSaldos
+        .Include(l => l.IsbnNavigation)
+        .Where(l => l.ButikId == butik.Id)
+        .ToList();
+
+    if (lagerLista.Count == 0)
+    {
+        Console.WriteLine("Lagret är tomt");
+    }
+    else
+    {
+        Console.WriteLine("{0,-35} {1,-15} {2,5}", "Titel", "ISBN", "Antal");
+        Console.WriteLine("------------------------------------------------------------------");
+
+        foreach (var rad in lagerLista)
+        {
+            string titel = rad.IsbnNavigation.Titel.Length > 30
+                ? rad.IsbnNavigation.Titel.Substring(0, 27) + "..."
+                : rad.IsbnNavigation.Titel;
+
+            Console.WriteLine("{0,-35} {1,-15} {2,5}", titel, rad.IsbnNavigation.Isbn13, rad.Antal);
+        }
+    }
+
+    Console.WriteLine("\nTryck Enter för att gå tillbaka:");
+    Console.ReadLine();
 }
 
