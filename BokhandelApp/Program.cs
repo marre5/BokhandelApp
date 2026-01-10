@@ -1,5 +1,6 @@
 ﻿using BokhandelApp.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using System.ComponentModel.Design;
 
 using var db = new BokhandelDbContext();
@@ -76,7 +77,9 @@ void ButiksMeny(Butiker butik)
         Console.WriteLine("[2] Ändra lagersaldo");
         Console.WriteLine("[3] Lägg till ny bok i sortimentet");
         Console.WriteLine("[4] Ta bort bok ur sortimentet");
+        Console.ForegroundColor = ConsoleColor.Yellow;
         Console.WriteLine("[0] Gå tillbaka till huvudmenyn");
+        Console.ResetColor();
 
         Console.WriteLine("\nDitt val: (ange siffra) ");
         string input = Console.ReadLine();
@@ -88,6 +91,9 @@ void ButiksMeny(Butiker butik)
                 break;
             case "0":
                 return;
+            case "2":
+                AndraLagersaldo(butik);
+                break;
             default:
                 break;
         }
@@ -126,7 +132,96 @@ void VisaLagersaldo(Butiker butik)
         }
     }
 
-    Console.WriteLine("\nTryck Enter för att gå tillbaka:");
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine("\nTryck Enter för att gå tillbaka.");
+    Console.ResetColor();
+    Console.ReadLine();
+}
+
+void AndraLagersaldo(Butiker butik)
+{
+    Console.Clear();
+    Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine($"                                        --- ÄNDRA LAGERSALDO: {butik.Butiksnamn} ---");
+    Console.ResetColor();
+
+    var saldoButik = db.LagerSaldos
+        .Include(l => l.IsbnNavigation)
+        .Where(l => l.ButikId == butik.Id)
+        .ToList();
+
+    if (saldoButik.Count == 0)
+    {
+        Console.WriteLine("Butiken har inga böcker/saknar saldo");
+        Console.ReadKey();
+        return;
+    }
+
+    Console.WriteLine("\nVälj vilken bok du vill ändra saldo på:");
+    Console.WriteLine("-------------------------------------------");
+
+    for (int i = 0; i < saldoButik.Count; i++)
+    {
+        var titelPlats = saldoButik[i];
+        Console.WriteLine($"[{i + 1}] {titelPlats.IsbnNavigation.Titel} (Saldo: {titelPlats.Antal})");
+    }
+
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine("[0] Gå tillbaka till huvudmenyn");
+    Console.ResetColor();
+
+    Console.Write("\nAnge vilken bok du vill ändra lagersaldo på: ");
+    string saldoInput = Console.ReadLine();
+
+    if (int.TryParse(saldoInput, out int index))
+    {
+        if (index == 0) return;
+
+        int saldoIndex = index - 1;
+
+        if (saldoIndex >= 0 && saldoIndex < saldoButik.Count)
+        {
+            var titelPlats = saldoButik[saldoIndex];
+
+            Console.WriteLine($"\n Vald bok: {titelPlats.IsbnNavigation.Titel}");
+            Console.WriteLine($"Nuvarande antal: {titelPlats.Antal}");
+
+            Console.Write("Ange nytt lagersaldo: ");
+            if (int.TryParse(Console.ReadLine(), out int nyttSaldo))
+            {
+                titelPlats.Antal = nyttSaldo;
+
+                db.SaveChanges();
+
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Saldot är uppdaterat!");
+                Console.ResetColor();
+            }
+            else
+            {
+                Console.ForegroundColor= ConsoleColor.Red;
+                Console.WriteLine("Ogiltigt val. Du måste skriva en siffra!");
+                Console.ResetColor();
+            }
+        }
+        else
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("Ogiltigt val. Siffran finns inte i listan!");
+            Console.ResetColor();
+        }
+    }
+
+    else
+    {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine("Ogiltig inmatning: Du måste skriva en siffra.");
+        Console.ResetColor();
+    }
+
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine("\nTryck Enter för att gå tillbaka.");
+    Console.ResetColor();
     Console.ReadLine();
 }
 
