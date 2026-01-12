@@ -51,13 +51,17 @@ void ValjButik()
             }
             else
             {
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Butiken hittades inte. Tryck Enter.");
+                Console.ResetColor();
                 Console.ReadLine();
             }
         }
         else
         {
+            Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("Ogiligt val. Tryck Enter.");
+            Console.ResetColor();
             Console.ReadLine();
         }
     }
@@ -93,6 +97,9 @@ void ButiksMeny(Butiker butik)
                 break;
             case "2":
                 AndraLagersaldo(butik);
+                break;
+            case "3":
+                LaggTillNyBok(butik);
                 break;
             case "4":
                 TaBortBok(butik);
@@ -318,3 +325,102 @@ void TaBortBok(Butiker butik)
     Console.ReadLine();
 }
 
+void LaggTillNyBok(Butiker butik)
+{
+    Console.Clear();
+    Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine($"                                        --- LÄGG TILL NY BOK: {butik.Butiksnamn}");
+    Console.ResetColor();
+
+    var hamtaAllaBocker = db.Böckers.ToList();
+
+    var butikensBocker = db.LagerSaldos
+        .Where(l => l.ButikId == butik.Id)
+        .Select(l => l.Isbn)
+        .ToList();
+
+    var bockerAttLaggaTill = hamtaAllaBocker
+        .Where(b => !butikensBocker.Contains(b.Isbn13))
+        .ToList();
+
+    if (bockerAttLaggaTill.Count == 0)
+    {
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.WriteLine("\nDin butik har redna alla böcker som finns i systemet!");
+        Console.WriteLine("Använd menyval '[2] Ändra lagersaldo' om du vill justera saldot för en bok.");
+        Console.ResetColor();
+        Console.ReadKey();
+        return;
+    }
+
+    Console.WriteLine("\nFöljande böcker finns i systemet men saknas i din butik:");
+    Console.WriteLine("-----------------------------------------------------------");
+
+    for (int i = 0; i < bockerAttLaggaTill.Count; i++)
+    {
+        Console.WriteLine($"[{i + 1}] {bockerAttLaggaTill[i].Titel} ({bockerAttLaggaTill[i].Isbn13})");
+    }
+
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine("[0] Avbryt");
+    Console.ResetColor();
+
+    Console.Write("\nVälj vilken bok du vill lägga in i din butiks sortiment: ");
+    string input = Console.ReadLine();
+
+    if (int.TryParse(input, out int siffraInput))
+    {
+        if (siffraInput == 0) return;
+
+        int index = siffraInput - 1;
+
+        if (index >= 0 && index < bockerAttLaggaTill.Count)
+        {
+            var bokInput = bockerAttLaggaTill[index];
+
+            Console.WriteLine($"\nHur många exemplar av {bokInput.Titel} vill du lägga till i lagret?");
+            Console.Write("Ange antal: ");
+
+            if (int.TryParse(Console.ReadLine(), out int antal))
+            {
+                var nyBok = new LagerSaldo
+                {
+                    ButikId = butik.Id,
+                    Isbn = bokInput.Isbn13,
+                    Antal = antal
+                };
+
+                db.LagerSaldos.Add(nyBok);
+                db.SaveChanges();
+
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine($"\n'{bokInput.Titel}' är nu tillagd i butikens sortiment och saldot är uppdaterat!");
+                Console.ResetColor();
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Ogiltigt antal.");
+                Console.ResetColor();
+            }
+        }
+        else
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("Ogiltig inmatning: Du måste skriva en siffra.");
+            Console.ResetColor();
+        }
+    }
+    else
+    {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine("Ogiltig inmatning: Du måste skriva en siffra.");
+        Console.ResetColor();
+    }
+
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine("\nTryck Enter för att gå tillbaka.");
+    Console.ResetColor();
+    Console.ReadLine();
+
+}
