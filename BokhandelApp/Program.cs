@@ -86,15 +86,21 @@ void ButiksMeny(Butiker butik)
 
         switch (input)
         {
+            case "0":
+                return;
             case "1":
                 VisaLagersaldo(butik);
                 break;
-            case "0":
-                return;
             case "2":
                 AndraLagersaldo(butik);
                 break;
+            case "4":
+                TaBortBok(butik);
+                break;
             default:
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Ogiltigt val.");
+                Console.ResetColor();
                 break;
         }
     }
@@ -212,6 +218,93 @@ void AndraLagersaldo(Butiker butik)
         }
     }
 
+    else
+    {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine("Ogiltig inmatning: Du måste skriva en siffra.");
+        Console.ResetColor();
+    }
+
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine("\nTryck Enter för att gå tillbaka.");
+    Console.ResetColor();
+    Console.ReadLine();
+}
+
+void TaBortBok(Butiker butik)
+{
+    Console.Clear();
+    Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine($"                                        --- TA BORT BOK UR SORTIMENTET: {butik.Butiksnamn} ---");
+    Console.ResetColor();
+
+    var saldoButik = db.LagerSaldos
+        .Include(l => l.IsbnNavigation)
+        .Where(l => l.ButikId == butik.Id)
+        .ToList();
+
+    if (saldoButik.Count == 0)
+    {
+        Console.WriteLine("Butiken har inga böcker att ta bort.");
+        Console.ReadKey();
+        return;
+    }
+
+    Console.WriteLine("\nVälj vilken bok som ska tas bort ur sortimentet:");
+    Console.WriteLine("------------------------------------------------------");
+
+    for (int i = 0; i < saldoButik.Count; i++)
+    {
+        Console.WriteLine($"[{i + 1}] {saldoButik[i].IsbnNavigation.Titel}");
+    }
+
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine("[0] Avbryt");
+    Console.ResetColor();
+
+    Console.Write("\nAnge siffra: ");
+    string input = Console.ReadLine();
+
+    if (int.TryParse(input, out int index))
+    {
+        if (index == 0) return;
+
+        int saldoIndex = index - 1;
+
+        if (saldoIndex >= 0 && saldoIndex < saldoButik.Count)
+        {
+            var taBort = saldoButik[saldoIndex];
+
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"\nÄr du säker på att du vill ta bort '{taBort.IsbnNavigation.Titel}'?");
+            Console.ResetColor();
+            Console.WriteLine("\nVIKTIGT: Bekräfta genom att skriva [JA], avbryt med [Enter].");
+
+            string svarInput = Console.ReadLine().ToLower();
+
+            if (svarInput == "ja")
+            {
+                db.LagerSaldos.Remove(taBort);
+                db.SaveChanges();
+
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("\nBorttagning har lyckats. Boken är nu borttagen ur sortimentet.");
+                Console.ResetColor();
+            }
+            else
+            {
+                Console.ForegroundColor= ConsoleColor.Red;
+                Console.WriteLine("\nBorttagning misslyckats. Avbryter åtgärden.");
+                Console.ResetColor();
+            }
+        }
+        else
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("\nOgiltigt val. Siffran finns inte i listan!");
+            Console.ResetColor();
+        }
+    }
     else
     {
         Console.ForegroundColor = ConsoleColor.Red;
