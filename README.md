@@ -1,11 +1,10 @@
 # BokhandelApp
 
 ## Installation
-För att köra programmet behöver du Visual Studio med .NET 8 samt SSMS för att återställa och använda databasen
-1. Klona projektet
-2. Återställ databasen i SSMS
-3. Slutför återställningen och döp databasen till 'BokhandelDB'
-4. Öppna projektet i Visual studio och kör programmet
+För att köra programmet behöver du Visual Studio med .NET 8 samt SSMS22 för att återställa och använda databasen
+1. Återställ databasen i SSMS med hjälp av .bak-filen
+2. Slutför återställningen och döp databasen till 'BokhandelDB' om inte den döps automatiskt
+3. Klona och öppna projektet i Visual Studio och starta igång det med F5
 
 ## Funktioner
 
