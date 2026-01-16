@@ -20,7 +20,7 @@ namespace BokhandelApp
         public void Run()
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("                                           VÄLKOMMEN TILL ADMIN-PORTALEN");
+            Console.WriteLine("                                        --- VÄLKOMMEN TILL ADMIN-PORTALEN ---");
             Console.ResetColor();
             Console.WriteLine();
             Console.WriteLine();
@@ -272,7 +272,7 @@ namespace BokhandelApp
             }
 
             Console.WriteLine("\nVälj vilken bok som ska tas bort ur sortimentet:");
-            Console.WriteLine("------------------------------------------------------");
+            Console.WriteLine("--------------------------------------------------------");
 
             for (int i = 0; i < saldoButik.Count; i++)
             {
@@ -343,7 +343,7 @@ namespace BokhandelApp
         {
             Console.Clear();
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"                                        --- LÄGG TILL NY BOK: {butik.Butiksnamn}");
+            Console.WriteLine($"                                        --- LÄGG TILL NY BOK: {butik.Butiksnamn} ---");
             Console.ResetColor();
 
             var hamtaAllaBocker = db.Böckers.ToList();
