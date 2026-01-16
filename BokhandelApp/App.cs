@@ -360,7 +360,7 @@ namespace BokhandelApp
             if (bockerAttLaggaTill.Count == 0)
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("\nDin butik har redna alla böcker som finns i systemet!");
+                Console.WriteLine("\nDin butik har redan alla böcker som finns i systemet!");
                 Console.WriteLine("Använd menyval '[2] Ändra lagersaldo' om du vill justera saldot för en bok.");
                 Console.ResetColor();
                 Console.ReadKey();
